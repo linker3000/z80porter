@@ -7,3 +7,5 @@ The program works with I/O mapped ports (e.g.: the RC2014 digital I/O board), th
 ![Image](porter1.png)
 
 ![Image](porter2.png)
+
+![Image](porter3.png)
