@@ -1,4 +1,3 @@
-
 program porter;
 
 (*
@@ -6,7 +5,7 @@ program porter;
 
    Supports IO write, Z80 PIO chip and Z80MBC2 optional ports.
 
-   This version: 1.11 14 Jun 2019 Turbo Pascal
+   This version: 1.2 29 Sep 2019 Turbo Pascal
 
    Author: N. Kendrick (linker3000@gmail.com)
 
@@ -27,11 +26,12 @@ type
   str2   = string[2];
 
 const
-  descStr  : str255 = 'Z80 port writer    V1.1 Linker3000 May 2019';
+  descStr  : str255 = 'Z80 port writer    V1.2 Linker3000 Sep 2019';
   hexC     : array[0..15] of char = '0123456789ABCDEF';
 
-  {Single bit and the Newton patterns...}
-  LED      : array[0..11] of byte = (1,2,4,8,16,32,64,128,129,66,36,24);
+  {Single bit, Newton and moving hole patterns...}
+  LED      : array[0..19] of byte = (1,2,4,8,16,32,64,128,129,66,36,24,
+                     254,253,251,247,239,223,191,127);
 
   SCBase   : byte = 104; {RC2014 PIO board SC103 104 = $068}
   IOBase   : byte = 0;   {RC22014 SC diag/LED port}
@@ -347,9 +347,9 @@ begin
   writeln;
   writeln ('You can also control this program on the command line as follows.');
   writeln;
-  writeln ('<program_name> -H OR -Mmode -Aport# -P[a|b] -Snnn -V[value or letter]');
+  writeln ('<program_name> -? OR -Mmode -Aport# -P[a|b] -Snnn -V[value or letter]');
   writeln;
-  writeln ('Where: -H prints this help.');
+  writeln ('Where: -? prints this help.');
   writeln ('       -M is output mode: 0 = I/O Port, 1 = Z80 PIO, 2 = Z80-MBC2.');
   writeln ('           (If used must be the 1st option.)');
   writeln ('       -A is the IO port or PIO base address in decimal or $hex.');
@@ -379,7 +379,7 @@ begin
     end;
 
     case upCase(mChoice[1]) of
-      'H' : helpPage;
+      '?' : helpPage;
       'S' : begin
               setSpeed;
               if screenMode then topText;
@@ -405,6 +405,7 @@ begin
               delay(round(speed * 60));
             until keypressed;
       'Q' : myNum := -1;
+      'H' : scanner(12,19);
       else
       begin
         val (mChoice,myNum,I);
@@ -431,8 +432,8 @@ begin
     val(S2,V,dummy);
     V := abs(V);
 
-    if ((S2 <> '') or (C = 'H')) then case C of
-      'H' : begin
+    if ((S2 <> '') or (C = '?')) then case C of
+      '?' : begin
               screenMode := false;
               helpPage;
             end;
@@ -450,9 +451,9 @@ begin
 
       'V' : begin
               screenMode := false;
-              if upcase(S2[1]) in ['H','N','L','C','W','U','F','R','P'] then
+              if upcase(S2[1]) in ['?','N','L','C','W','U','F','R','P','H'] then
               begin
-                if (upcase(S2[1]) <> 'H') then initPort;
+                if (upcase(S2[1]) <> '?') then initPort;
                 doAction(S2[1]);
               end
               else if (V < 256) then
@@ -488,9 +489,9 @@ begin
     writeln ('What do you want to do');
     writeln ('~~~~~~~~~~~~~~~~~~~~~~');
     writeln;
-    writeln ('Change (S)peed  (C)ount up     Count do(W)n  (U)p/Down cycle');
-    writeln ('(N)ewton        (F)lash        (R)andom      re(P)eat random');
-    writeln ('(L)arson scan   (M)ode change  (H)elp        (Q)uit');
+    writeln ('(S)peed   (C)ount up     Count do(W)n  (U)p/Down cycle');
+    writeln ('(N)ewto   (F)lash        (R)andom      re(P)eat random');
+    writeln ('(L)arson  Moving (H)ole  (M)ode change (?) Help  (Q)uit');
     writeln;
     writeln ('Most sequences can be stopped by pressing a key.');
     writeln;
